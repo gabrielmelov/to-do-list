@@ -6,7 +6,9 @@ import { Header } from './components/Header'
 
 import clipboard from './assets/clipboard.svg'
 import { Task } from './components/Task'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+
+const LOCAL_STORAGE_KEY = "todo:savedTasks"
 
 export interface Tasks {
   id: string;
@@ -15,23 +17,30 @@ export interface Tasks {
 }
 
 export function App() {
-  const [tasks, setTasks] = useState<Tasks[]>([
-    {
-      id: 'string',
-      title: 'teste',
-      isCompleted: true,
-    },    
-  ])
+  const [tasks, setTasks] = useState<Tasks[]>([])
 
-  const taskQuantity = tasks.length;
-  const completedTasks = tasks.filter((task) => task.isCompleted).length
+  function loadSavedTasks() {
+    const savedTasks = localStorage.getItem(LOCAL_STORAGE_KEY)
+    if(savedTasks) {
+      setTasks(JSON.parse(savedTasks))
+    }
+  }
+
+  useEffect(() => {
+    loadSavedTasks()
+  }, [])
+
+  function setTasksAndSave(newTasks:Tasks[]) {
+    setTasks(newTasks)
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newTasks))
+  }
 
   const [title, setTitle] = useState("");
 
-  function handleSubmit(event: FormEvent) {
+  function addTask(event: FormEvent) {
     event.preventDefault()
 
-    setTasks([...tasks, {
+    setTasksAndSave([...tasks, {
       id: crypto.randomUUID(),
       title: title,
       isCompleted: false
@@ -40,7 +49,7 @@ export function App() {
     setTitle("")
   }
 
-  function handleToggleCheckedStatus(taskId: string) {
+  function toggleCheckedStatus(taskId: string) {
     const newTasks = tasks.map((task) => {
       if(task.id === taskId) {
         return {
@@ -49,30 +58,32 @@ export function App() {
         }
       }
       return task
-    })
-
-    setTasks(newTasks)
+    });
+    setTasksAndSave(newTasks)
   }
 
-  function handleChangeText(event: ChangeEvent<HTMLInputElement>) {
+  function changeText(event: ChangeEvent<HTMLInputElement>) {
     console.log(title)
     setTitle(event.target.value)
   }
 
-  function handleDeleteTask(taskId:string) {
+  function deleteTask(taskId:string) {
     const newTasks = tasks.filter((task) => task.id !== taskId)
-    setTasks(newTasks)
+    setTasksAndSave(newTasks)
   }
+
+  const taskQuantity = tasks.length;
+  const completedTasks = tasks.filter((task) => task.isCompleted).length
 
   return (
     <div>
       <Header />
 
       <div className={styles.wrapper}>
-        <form className={styles.formGroup} onSubmit={handleSubmit}>
+        <form className={styles.formGroup} onSubmit={addTask}>
           <input
             placeholder="Adicione uma nova tarefa"
-            onChange={handleChangeText} 
+            onChange={changeText} 
             value={title}
           />
           <button type="submit">
@@ -107,8 +118,8 @@ export function App() {
               return (
               <Task
                 tasks={task}
-                onDelete={handleDeleteTask}
-                onComplete={handleToggleCheckedStatus}
+                onDelete={deleteTask}
+                onComplete={toggleCheckedStatus}
               />
               )
             })}
