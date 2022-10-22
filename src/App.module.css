@@ -55,7 +55,7 @@
   display: flex;
   justify-content: space-between;
 
-  margin: 4rem 0 1.5rem;
+  margin: 3.25rem 0 1.5rem;
   font-size: 0.875rem;
 }
 
@@ -88,12 +88,11 @@
 
 .paragraph {
   margin-top: 1rem;
-
   text-align: center;
   color: var(--gray-300);
   line-height: 1.5;
 }
 
-.paragraph p:first-child {
+.nothingTasks {
   font-weight: 600;
 }
