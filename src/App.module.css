@@ -51,6 +51,10 @@
   background: var(--blue);
 }
 
+.formGroup button:disabled {
+  cursor: not-allowed;
+}
+
 .taskCounter {
   display: flex;
   justify-content: space-between;
