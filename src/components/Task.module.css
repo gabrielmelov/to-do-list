@@ -1,0 +1,45 @@
+.task {
+  background: var(--gray-500);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.75rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.775rem;
+}
+
+.toggleChecked {
+  background: none;
+  border: none;
+}
+
+.task p {
+  color: var(--gray-200);
+  line-height: 1.6;
+  font-size: 0.875rem;
+  text-align: left;
+  margin-right: auto;
+  line-break:anywhere;
+}
+
+p.textCompleted {
+  color: var(--gray-300);
+  text-decoration: line-through;
+}
+
+.deleteTask {
+  background: none;
+  border: none;
+}
+
+.deleteTask svg {
+  color: var(--gray-300);
+
+  transition: 0.1s;
+}
+
+.deleteTask svg:hover {
+  color: var(--danger);
+}
