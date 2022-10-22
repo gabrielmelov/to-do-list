@@ -6,7 +6,7 @@ import { Header } from './components/Header'
 
 import clipboard from './assets/clipboard.svg'
 import { Task } from './components/Task'
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { ChangeEvent, FormEvent, InvalidEvent, useEffect, useState } from 'react'
 
 const LOCAL_STORAGE_KEY = "todo:savedTasks"
 
@@ -39,17 +39,19 @@ export function App() {
 
   function addTask(event: FormEvent) {
     event.preventDefault()
-
     setTasksAndSave([...tasks, {
       id: crypto.randomUUID(),
       title: title,
       isCompleted: false
     }])
-
     setTitle("")
   }
 
-  function toggleCheckedStatus(taskId: string) {
+  function handleInvalidTask(event:InvalidEvent<HTMLInputElement>) {
+    event.target.setCustomValidity('Esse campo é obrigatório!')
+  }
+
+  function handleToggleCheckedStatus(taskId: string) {
     const newTasks = tasks.map((task) => {
       if(task.id === taskId) {
         return {
@@ -62,18 +64,20 @@ export function App() {
     setTasksAndSave(newTasks)
   }
 
-  function changeText(event: ChangeEvent<HTMLInputElement>) {
-    console.log(title)
+  function handleChangeText(event: ChangeEvent<HTMLInputElement>) {
+    event.target.setCustomValidity('')
     setTitle(event.target.value)
   }
 
-  function deleteTask(taskId:string) {
+  function handleDeleteTask(taskId:string) {
     const newTasks = tasks.filter((task) => task.id !== taskId)
     setTasksAndSave(newTasks)
   }
 
   const taskQuantity = tasks.length;
   const completedTasks = tasks.filter((task) => task.isCompleted).length
+
+  const emptyInputText = title.length === 0;
 
   return (
     <div>
@@ -83,10 +87,12 @@ export function App() {
         <form className={styles.formGroup} onSubmit={addTask}>
           <input
             placeholder="Adicione uma nova tarefa"
-            onChange={changeText} 
+            onChange={handleChangeText} 
             value={title}
+            onInvalid={handleInvalidTask}
+            required
           />
-          <button type="submit">
+          <button type="submit" disabled={emptyInputText}>
             Criar
             <PlusCircle size={20} />
           </button>
@@ -118,8 +124,8 @@ export function App() {
               return (
               <Task
                 tasks={task}
-                onDelete={deleteTask}
-                onComplete={toggleCheckedStatus}
+                onDelete={handleDeleteTask}
+                onComplete={handleToggleCheckedStatus}
               />
               )
             })}
